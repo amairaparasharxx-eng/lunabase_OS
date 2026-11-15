@@ -537,20 +537,36 @@ if st.button("Load NASA Astronomy Picture of the Day"):
         st.subheader(apod.get("title", "NASA Astronomy Picture"))
 
         if apod.get("media_type") == "image":
-            st.image(apod["url"], use_container_width=True)
+            # Prefer NASA's high-resolution image URL when available.
+            image_url = apod.get("hdurl") or apod.get("url")
+
+            if image_url:
+                try:
+                    image_response = requests.get(image_url, timeout=20)
+                    image_response.raise_for_status()
+
+                    content_type = image_response.headers.get("Content-Type", "")
+                    if content_type.startswith("image/"):
+                        st.image(image_response.content, use_container_width=True)
+                    else:
+                        st.warning("NASA returned a page instead of an image.")
+                        st.markdown(f"[Open the NASA image]({image_url})")
+                except requests.RequestException:
+                    st.warning("The image could not be loaded directly.")
+                    st.markdown(f"[Open the NASA image]({image_url})")
+            else:
+                st.warning("NASA did not provide an image URL.")
 
         else:
             st.info(
                 "Today's NASA feature is not a still image. "
                 "Use the link below to view it."
             )
-
-        st.write(apod.get("explanation", ""))
-
-        if apod.get("media_type") != "image":
             st.markdown(
                 f"[View NASA feature]({apod.get('url', '')})"
             )
+
+        st.write(apod.get("explanation", ""))
 
     else:
         st.warning(
