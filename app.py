@@ -448,7 +448,7 @@ st.write(
 
 with st.spinner("Connecting to NASA..."):
 
-    flare, flare_error = fetch_solar_flares(nasa_key)
+    flare, flare_error = fetch_solar_flares(api_key)
 
 if flare:
 
@@ -494,7 +494,7 @@ if st.button("Load NASA Astronomy Picture of the Day"):
 
     with st.spinner("Retrieving NASA astronomy image..."):
 
-        apod = fetch_apod(nasa_key)
+        apod = fetch_apod(api_key)
 
     if apod:
 
