@@ -140,11 +140,13 @@ st.sidebar.title("🚀 FLIGHT CONTROL")
 
 st.sidebar.markdown("### NASA Connection")
 
-nasa_key = st.sidebar.text_input(
-    "NASA API Key",
-    value="7cmLFwRtnBQ6DqhdpBpRNwW9jzLtPR9KwkgtqD67",
-    type="password"
-)
+api_key = st.secrets.get("NASA_API_KEY", "")
+
+if not api_key:
+    api_key = st.sidebar.text_input(
+        "NASA API Key",
+        type="password"
+    )
 
 st.sidebar.caption(
     "Use your personal NASA API key or DEMO_KEY."
