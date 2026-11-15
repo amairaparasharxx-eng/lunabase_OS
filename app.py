@@ -57,7 +57,43 @@ def show_art(filename, caption=None, width=None):
         st.info(f"Artwork placeholder: Add {filename} to your project folder.")
 
 @st.cache_data(ttl=3600)
+@st.cache_data(ttl=3600)
 def fetch_solar_flares(api_key):
+    try:
+        end_date = date.today()
+        start_date = end_date - timedelta(days=30)
+
+        url = "https://ccmc.gsfc.nasa.gov/DONKI-API/get/FLR"
+
+        params = {
+            "startDate": start_date.isoformat(),
+            "endDate": end_date.isoformat()
+        }
+
+        response = requests.get(
+            url,
+            params=params,
+            timeout=20
+        )
+
+        response.raise_for_status()
+        flares = response.json()
+
+        if not flares:
+            return None, "No solar flare records found in this date range."
+
+        flares.sort(
+            key=lambda x: x.get("beginTime", ""),
+            reverse=True
+        )
+
+        return flares[0], None
+
+    except requests.exceptions.RequestException as e:
+        return None, f"NASA data request failed: {e}"
+
+    except (ValueError, TypeError, KeyError) as e:
+        return None, f"Could not process NASA data: {e}"
 
     end_date = date.today()
     start_date = end_date - timedelta(days=30)
